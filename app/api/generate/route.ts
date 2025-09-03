@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../lib/supabase-admin';
-import { toSlug, type Prompt } from '../../../agents/utils';
-import { outlineAgent } from '../../../agents/outline';
-import { textAgent } from '../../../agents/text';
-import { imageAgent } from '../../../agents/image';
-
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { toSlug, type Prompt } from '@/agents/util';
+import { outlineAgent } from '@/agents/outline';
+import { textAgent } from '@/agents/text';
+import { imageAgent } from '@/agents/image';
 // If you don't have the @ alias configured, change the imports above to relative paths.
 
 export async function POST(req: NextRequest) {

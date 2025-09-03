@@ -10,20 +10,15 @@
         "esModuleInterop": true,
         "strict": true,
         "jsx": "react-jsx",
-        "allowJs": false,
-        "forceConsistentCasingInFileNames": true,
         "skipLibCheck": true,
         "types": [
             "node"
-        ]
-    },
-    "include": [
-        "app",
-        "agents",
-        "lib",
-        "next-env.d.ts"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "*"
+            ]
+        }
+    }
 }
