@@ -1,14 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
+let url = process.env.SUPABASE_URL;
+let key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-
-const url = process.env.SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabase = createClient(
+console.log("GOT Supabase URL:", url);
+console.log("GOT Supabase Key:", key ? key.substring(0, 4) + '...' : 'undefined');
+export const supabaseAdmin = createClient(
   process.env.SUPABASE_URL!, 
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-export const supabaseAdmin = createClient(url, serviceKey, {
-auth: { persistSession: false },
-});
