@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { toSlug, type Prompt } from '@/agents/util';
+import { toSlug, type Prompt } from '@/agents/utils';
 import { outlineAgent } from '@/agents/outline';
 import { textAgent } from '@/agents/text';
 import { imageAgent } from '@/agents/image';
