@@ -1,21 +1,45 @@
+// app/[course]/page.tsx
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
+export const revalidate = 120;
 
-export default async function CoursePage({ params }: { params: { course: string } }) {
-const { data: course } = await supabaseAdmin.from('courses').select('*').eq('slug', params.course).maybeSingle();
-if (!course) return <div>Not found</div>;
-const { data: modules } = await supabaseAdmin.from('modules').select('*').eq('course_id', course.id).order('position');
-return (
-<main>
-<h2>{course.title}</h2>
-<p>{course.description ?? ''}</p>
-<h3>Modules</h3>
-<ul>
-{(modules ?? []).map((m: any) => (
-<li key={m.id}><Link href={`/${params.course}/${m.slug}`}>{m.title}</Link></li>
-))}
-</ul>
-</main>
-);
+export default async function CoursePage(
+  props: { params: Promise<{ course: string }> }
+) {
+  const { course: courseSlug } = await props.params;
+
+  const { data: courseRow, error: cErr } = await supabaseAdmin
+    .from('courses')
+    .select('id, slug, title, description, published, visibility')
+    .eq('slug', courseSlug)
+    .maybeSingle();
+
+  if (cErr) throw new Error(`Failed to load course: ${cErr.message}`);
+  if (!courseRow || !courseRow.published || courseRow.visibility !== 'public') notFound();
+
+  const { data: modules, error: mErr } = await supabaseAdmin
+    .from('modules')
+    .select('id, slug, title, position')
+    .eq('course_id', courseRow.id)
+    .order('position', { ascending: true });
+
+  if (mErr) throw new Error(`Failed to load modules: ${mErr.message}`);
+
+  return (
+    <main>
+      <h1>{courseRow.title}</h1>
+      {courseRow.description && <p>{courseRow.description}</p>}
+      <h2>Modules</h2>
+      <ul>
+        {(modules ?? []).map((m) => (
+          <li key={m.id}>
+            <Link href={`/${courseRow.slug}/${m.slug}`}>{m.title}</Link>
+          </li>
+        ))}
+      </ul>
+      {!modules?.length && <p>No modules yet.</p>}
+    </main>
+  );
 }
