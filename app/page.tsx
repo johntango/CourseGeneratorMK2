@@ -1,3 +1,5 @@
+//triage/page.tsx
+// 
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import Link from 'next/link';
 
