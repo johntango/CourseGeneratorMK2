@@ -1,0 +1,81 @@
+:root {
+  /* Light theme */
+  --bg: #f8f9fa;           /* light gray (Bootstrap body background) */
+  --fg: #212529;           /* Bootstrap body text */
+  --card-bg: #ffffff;
+  --card-fg: #212529;
+  --muted: #6c757d;
+  --link: #0d6efd;
+  --border: #dee2e6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark theme */
+    --bg: #0f1115;         /* deep neutral (safer than pure black) */
+    --fg: #e9ecef;         /* light gray text */
+    --card-bg: #141821;    /* dark card */
+    --card-fg: #e9ecef;
+    --muted: #a0a6ad;
+    --link: #6ea8fe;
+    --border: #2b3040;
+  }
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+a { color: var(--link); }
+a:hover { color: var(--link); opacity: .9; }
+
+/* Card helpers to guarantee readable contrast */
+.card.bg-body, .bg-body {
+  background-color: var(--card-bg) !important;
+  color: var(--card-fg) !important;
+  border-color: var(--border) !important;
+}
+
+/* Muted text that remains readable in dark mode */
+.text-muted { color: var(--muted) !important; }
+
+/* Table readability in both themes */
+.table thead th { border-bottom-color: var(--border); }
+.table td, .table th { color: var(--fg); border-color: var(--border); }
+
+/* Navbar safe defaults */
+.navbar {
+  border-bottom: 1px solid var(--border);
+}
+.navbar .nav-link { opacity: .9; }
+.navbar .nav-link:hover { opacity: 1; }
+
+/* Utility: constrain width for forms/pages */
+.container-narrow { max-width: 960px; }
+
+/* Buttons: keep Bootstrap defaults but ensure text contrast on outline */
+.btn-outline-secondary { color: var(--fg); border-color: var(--border); }
+.btn-outline-secondary:hover { background: var(--card-bg); }
+body.dark {
+  --bg: #0f1115;
+  --fg: #e9ecef;
+  --card-bg: #141821;
+  --card-fg: #e9ecef;
+  --muted: #a0a6ad;
+  --link: #6ea8fe;
+  --border: #2b3040;
+}
+body.light {
+  --bg: #f8f9fa;
+  --fg: #212529;
+  --card-bg: #ffffff;
+  --card-fg: #212529;
+  --muted: #6c757d;
+  --link: #0d6efd;
+  --border: #dee2e6;
+}
