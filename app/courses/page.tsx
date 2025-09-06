@@ -1,5 +1,8 @@
 // app/courses/page.tsx
 import { supabaseAdmin } from '@/lib/server/supabase';
+import Link from 'next/link';
+import CreateCourseButton from '@/components/CreateCourseButton';
+import EditDeleteCourseButtons from '@/components/EditDeleteCourseButtons';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,14 +16,13 @@ async function getCourses() {
 }
 
 export default async function CoursesPage() {
-  // ✅ define rows here
   const rows = await getCourses();
 
   return (
     <>
       <div className="d-flex align-items-center mb-3">
         <h1 className="me-auto mb-0">Courses</h1>
-        {/* create/edit buttons go here */}
+        <CreateCourseButton />
       </div>
 
       <div className="card bg-body">
@@ -50,8 +52,14 @@ export default async function CoursesPage() {
                       <td>{c.visibility}</td>
                       <td>{c.published ? 'Yes' : 'No'}</td>
                       <td>{new Date(c.created_at).toLocaleString()}</td>
-                      <td className="text-end">
-                        {/* buttons/links for view/edit here */}
+                      <td className="text-end d-flex gap-2 justify-content-end">
+                        <Link className="btn btn-sm btn-outline-primary" href={`/${c.slug}`}>
+                          View
+                        </Link>
+                        <Link className="btn btn-sm btn-outline-secondary" href={`/triage?course=${c.slug}`}>
+                          Triage
+                        </Link>
+                        <EditDeleteCourseButtons initial={c} />
                       </td>
                     </tr>
                   ))}
