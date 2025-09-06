@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/server/supabase';
 import { ok, badRequest, serverError } from '@/lib/server/http';
-import { generateCoursePlan } from '@/agents/generateCoursePlan';
+import { generateCoursePlan } from '@/agents/generate-course-plan';
 import { persistCoursePlan } from '@/lib/server/persist-course-plan';
 
 type Params = { course: string }; // slug
