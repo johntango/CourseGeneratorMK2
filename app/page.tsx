@@ -1,3 +1,4 @@
+import CreateCourseButton from '@/components/CreateCourseButton';
 export default async function CoursesPage() {
   async function getCourses() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/courses`, { cache: 'no-store' });
