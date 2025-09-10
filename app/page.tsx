@@ -6,6 +6,8 @@ export default async function CoursesPage() {
   const json = await res.json();
   return json.courses as Array<{ id:string; slug:string; title:string }>;
 }
+
+
   const rows = await getCourses();
 
   return (
