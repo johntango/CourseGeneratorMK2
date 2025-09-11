@@ -1,4 +1,5 @@
 # CourseGeneratorMK2
+If in CodeSpaces set up the following secrets 
 NEXT_PUBLIC_BASE_URL <http://<codespaces name> 
 NEXT_PUBLIC_SITE_URL <http://<codespaces name> 
 
