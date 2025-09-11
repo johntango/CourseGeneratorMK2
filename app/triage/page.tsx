@@ -1,8 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { runTriage } from '@/agents/triage';
-import { revalidatePath } from 'next/cache';
 import TriageForm from '@/components/TriageForm';
-
+import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 
 async function getData() {
   const { data: courses } = await supabaseAdmin
@@ -12,7 +11,7 @@ async function getData() {
   return { courses: (courses ?? []).filter(c => c.published && c.visibility === 'public') };
 }
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export default async function TriagePage() {
   const { courses } = await getData();
@@ -25,16 +24,32 @@ export default async function TriagePage() {
     const moduleSlug = String(formData.get('module') || '');
     const lessonSlug = String(formData.get('lesson') || '');
     const prompt = String(formData.get('prompt') || '').trim();
-
     if (!courseSlug || !prompt) throw new Error('course and prompt are required');
 
-    // optional log row (if you created triage_requests table)
-    // const { data: req } = await supabaseAdmin.from('triage_requests').insert({...}).select('*').single();
+    // ✅ Build absolute origin from request headers (no envs required)
+    const h = await headers();
+    const proto = h.get('x-forwarded-proto') ?? 'https';
+    const host  = h.get('x-forwarded-host')  ?? h.get('host');
+    const origin = `${proto}://${host}`;
 
-    const result = await runTriage({ scope, courseSlug, moduleSlug, lessonSlug, prompt });
-    if (result.status === 'failed') throw new Error(result.error || 'triage failed');
+    // ✅ Call the API endpoint directly
+    const res = await fetch(`${origin}/api/agents/triage`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ scope, courseSlug, moduleSlug, lessonSlug, prompt }),
+      cache: 'no-store',
+    });
 
-    // Update caches
+    // Helpful error: include response text if non-200
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(text || `triage failed (HTTP ${res.status})`);
+    }
+
+    // Optional: parse response (e.g., { runId })
+    // const { runId } = await res.json().catch(() => ({}));
+
+    // Revalidate affected pages
     revalidatePath('/');
     revalidatePath(`/${courseSlug}`);
     if (moduleSlug) revalidatePath(`/${courseSlug}/${moduleSlug}`);
@@ -46,8 +61,8 @@ export default async function TriagePage() {
       <h1>Triage Agent</h1>
       <p>Edit content at the course, module, or lesson level.</p>
       <TriageForm courses={courses} action={submit} />
-      <p style={{ opacity: 0.7, marginTop: 16 }}>
-        Changes are applied server-side and sanitized. You can review the output by navigating to the updated URL.
+      <p className="text-secondary mt-2">
+        Changes are applied server-side. Navigate to the updated page to review output.
       </p>
     </main>
   );
