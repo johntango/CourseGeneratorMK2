@@ -1,4 +1,15 @@
 # CourseGeneratorMK2
+NEXT_PUBLIC_BASE_URL <http://<codespaces name> 
+NEXT_PUBLIC_SITE_URL <http://<codespaces name> 
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY supabase
+NEXT_PUBLIC_SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_URL
+
+OPENAI_API_KEY
+
 
 # CourseGen MVP (Codespaces)
 
