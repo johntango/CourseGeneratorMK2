@@ -1,17 +1,39 @@
+// app/layout.tsx
 import '../styles/bootstrap';
 import Link from 'next/link';
+import AuthHeader from '@/components/AuthHeader';
 
 export const metadata = { title: 'CourseGen' };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-     <body className="d-flex flex-column min-vh-100 dark">
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      {/* Prefer Bootstrap’s dark theme attribute over a custom 'dark' class */}
+      <body className="d-flex flex-column min-vh-100" data-bs-theme="dark">
+        <nav className="navbar navbar-expand-lg bg-dark border-bottom">
           <div className="container">
             <Link className="navbar-brand" href="/">CourseGen</Link>
-            <div className="navbar-nav ms-auto">
-              <Link className="nav-link" href="/courses">Courses</Link>
-              <Link className="nav-link" href="/triage">Triage</Link>
+
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#mainNavbar"
+              aria-controls="mainNavbar"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span className="navbar-toggler-icon" />
+            </button>
+
+            <div className="collapse navbar-collapse" id="mainNavbar">
+              <div className="navbar-nav">
+                <Link className="nav-link" href="/courses">Courses</Link>
+                <Link className="nav-link" href="/triage">Triage</Link>
+              </div>
+
+              {/* Auth UI on the right */}
+              <AuthHeader />
             </div>
           </div>
         </nav>
@@ -22,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
 
-        <footer className="mt-auto py-3">
+        <footer className="mt-auto py-3 border-top">
           <div className="container text-muted small">
             © {new Date().getFullYear()} CourseGen • Readable in light & dark mode
           </div>
