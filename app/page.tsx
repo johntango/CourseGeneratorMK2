@@ -1,6 +1,7 @@
 import CreateCourseButton from '@/components/CreateCourseButton';
 export default async function CoursesPage() {
   async function getCourses() {
+    // make sure port is PUBLIC otherwise fetch will fail
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/courses`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load courses');
   const json = await res.json();
