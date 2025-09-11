@@ -1,53 +1,37 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
+// app/[course]/[module]/page.tsx
+import { supabaseAdmin } from '@/lib/server/supabase';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
-export const revalidate = 120;
+export const dynamic = 'force-dynamic';
 
-export default async function ModulePage(
-  props: { params: Promise<{ course: string; module: string }> }
-) {
-  const { course: courseSlug, module: moduleSlug } = await props.params;
+export default async function ModulePage({ params }: { params: { course: string; module: string } }) {
+  const { data: course } = await supabaseAdmin.from('courses').select('id, slug, title').eq('slug', params.course).single();
+  if (!course) return <div className="container py-4">Course not found</div>;
 
-  const { data: courseRow } = await supabaseAdmin
-    .from('courses')
-    .select('id, slug, title, published, visibility')
-    .eq('slug', courseSlug)
-    .maybeSingle();
-  if (!courseRow || !courseRow.published || courseRow.visibility !== 'public') notFound();
+  const { data: mod } = await supabaseAdmin.from('modules').select('id, slug, title').eq('course_id', course.id).eq('slug', params.module).single();
+  if (!mod) return <div className="container py-4">Module not found</div>;
 
-  const { data: moduleRow } = await supabaseAdmin
-    .from('modules')
-    .select('id, slug, title')
-    .eq('course_id', courseRow.id)
-    .eq('slug', moduleSlug)
-    .maybeSingle();
-  if (!moduleRow) notFound();
-
-  const { data: lessons, error: lErr } = await supabaseAdmin
+  const { data: lessons } = await supabaseAdmin
     .from('lessons')
-    .select('id, slug, title, summary, position, published')
-    .eq('module_id', moduleRow.id)
-    .eq('published', true)
+    .select('id, slug, title, position')
+    .eq('module_id', mod.id)
     .order('position', { ascending: true });
 
-  if (lErr) throw new Error(`Failed to load lessons: ${lErr.message}`);
-
   return (
-    <main>
-      <nav style={{ marginBottom: 12 }}>
-        <Link href={`/${courseRow.slug}`}>← {courseRow.title}</Link>
-      </nav>
-      <h1>{moduleRow.title}</h1>
-      <ul>
-        {(lessons ?? []).map((l) => (
-          <li key={l.id} style={{ margin: '8px 0' }}>
-            <Link href={`/${courseRow.slug}/${moduleRow.slug}/${l.slug}`}>{l.title}</Link>
-            {l.summary ? <div style={{ opacity: 0.8 }}>{l.summary}</div> : null}
-          </li>
-        ))}
-      </ul>
-      {!lessons?.length && <p>No published lessons yet.</p>}
+    <main className="container py-4">
+      <h1 className="h4 mb-3">{mod.title}</h1>
+      {!lessons?.length ? (
+        <div className="text-secondary">No lessons yet.</div>
+      ) : (
+        <ul className="list-group">
+          {lessons!.map(L => (
+            <li key={L.id} className="list-group-item bg-body d-flex justify-content-between">
+              <span>{L.title}</span>
+              <Link href={`/${course.slug}/${mod.slug}/${L.slug}`} className="btn btn-outline-secondary btn-sm">Open</Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }

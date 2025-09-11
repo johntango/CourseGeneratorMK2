@@ -6,77 +6,62 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
-type params = { course: string; module: string; lesson: string };
+type Params = { course: string; module: string; lesson: string };
 
-async function getScopedLesson({ course, module: mod, lesson }: Params) {
-  // 1) Course
-  const { data: c, error: cErr } = await supabaseAdmin
+async function getScopedLesson(course: string, mod: string, lesson: string) {
+  // 1) course
+  const { data: courseRow } = await supabaseAdmin
     .from('courses')
-    .select('id, slug, title')
+    .select('id, title, slug')
     .eq('slug', course)
-    .maybeSingle();
-  if (cErr || !c) return null;
+    .single();
+  if (!courseRow) return null;
 
-  // 2) Module
-  const { data: m, error: mErr } = await supabaseAdmin
+  // 2) module
+  const { data: moduleRow } = await supabaseAdmin
     .from('modules')
-    .select('id, slug, title, position')
-    .eq('course_id', c.id)
+    .select('id, title, slug')
+    .eq('course_id', courseRow.id)
     .eq('slug', mod)
-    .maybeSingle();
-  if (mErr || !m) return null;
+    .single();
+  if (!moduleRow) return null;
 
-  // 3) Lesson
-  const { data: l, error: lErr } = await supabaseAdmin
+  // 3) lesson
+  const { data: lessonRow } = await supabaseAdmin
     .from('lessons')
-    .select('id, slug, title, summary, content_html, content_md, published, position, updated_at')
-    .eq('module_id', m.id)
+    .select('id, title, slug, content, objectives, position, created_at')
+    .eq('module_id', moduleRow.id)
     .eq('slug', lesson)
-    .maybeSingle();
-  if (lErr || !l) return null;
+    .single();
+  if (!lessonRow) return null;
 
-  return { course: c, module: m, lesson: l };
+  return { course: courseRow, module: moduleRow, lesson: lessonRow };
 }
 
-export default async function LessonPage({ params }: { params: params }) {
-  const scoped = await getScopedLesson(params);
-  if (!scoped) return notFound();
+export default async function LessonPage({ params }: { params: Params }) {
+  // DO NOT destructure in the signature of getScopedLesson
+  const scoped = await getScopedLesson(params.course, params.module, params.lesson);
+  if (!scoped) notFound();
 
-  const { course, module: mod, lesson } = scoped;
-
+  const { course, module, lesson } = scoped;
   return (
-    <main>
+    <main className="container py-4">
       <nav aria-label="breadcrumb" className="mb-3">
         <ol className="breadcrumb">
-          <li className="breadcrumb-item"><Link href="/courses">Courses</Link></li>
           <li className="breadcrumb-item"><Link href={`/${course.slug}`}>{course.title}</Link></li>
-          <li className="breadcrumb-item"><Link href={`/${course.slug}/${mod.slug}`}>{mod.title}</Link></li>
+          <li className="breadcrumb-item"><Link href={`/${course.slug}/${module.slug}`}>{module.title}</Link></li>
           <li className="breadcrumb-item active" aria-current="page">{lesson.title}</li>
         </ol>
       </nav>
 
-      <div className="d-flex align-items-center mb-3">
-        <h1 className="me-auto mb-0">{lesson.title}</h1>
-        <span className="badge text-bg-secondary">{lesson.published ? 'Published' : 'Draft'}</span>
-      </div>
+      {lesson.objectives && (
+        <>
+          <h2 className="h6">Objectives</h2>
+          <p className="text-secondary" style={{ whiteSpace: 'pre-wrap' }}>{lesson.objectives}</p>
+        </>
+      )}
 
-      {lesson.summary ? <p className="text-muted">{lesson.summary}</p> : null}
-
-      <div className="card bg-body shadow-sm">
-        <div className="card-body">
-          {lesson.content_html ? (
-            <article dangerouslySetInnerHTML={{ __html: lesson.content_html }} />
-          ) : lesson.content_md ? (
-            <pre className="mb-0">{lesson.content_md}</pre>
-          ) : (
-            <div className="alert alert-info mb-0">No content yet. Use Triage to add material.</div>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-3 text-muted small">
-        Updated {lesson.updated_at ? new Date(lesson.updated_at).toLocaleString() : '—'}
-      </div>
+      <article style={{ whiteSpace: 'pre-wrap' }}>{lesson.content}</article>
     </main>
   );
 }

@@ -27,13 +27,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </button>
 
             <div className="collapse navbar-collapse" id="mainNavbar">
-              <div className="navbar-nav">
-                <Link className="nav-link" href="/courses">Courses</Link>
-                <Link className="nav-link" href="/triage">Triage</Link>
-              </div>
+                  <ul className="navbar-nav">
+                    <li className="nav-item"><Link className="nav-link" href="/courses">Courses</Link></li>
+                    <li className="nav-item"><Link className="nav-link" href="/triage">Triage</Link></li>
+                  </ul>
 
-              {/* Auth UI on the right */}
-              <AuthHeader />
+                  <ul className="navbar-nav ms-auto">
+                    <AuthHeader />
+                  </ul>
             </div>
           </div>
         </nav>
