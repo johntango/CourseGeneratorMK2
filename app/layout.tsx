@@ -1,15 +1,18 @@
+// app/layout.tsx
 import '../styles/bootstrap';
 import Link from 'next/link';
 import AuthHeader from '@/components/AuthHeader';
 
 export const metadata = { title: 'CourseGen' };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-     <body className="d-flex flex-column min-vh-100 dark">
-        <nav className="navbar navbar-expand-lg navbar-dark border-bottom" style={{ backgroundColor: 'var(--bs-navbar-bg)' }}>
+      {/* Prefer Bootstrap’s dark theme attribute over a custom 'dark' class */}
+      <body className="d-flex flex-column min-vh-100" data-bs-theme="dark">
+        <nav className="navbar navbar-expand-lg bg-dark border-bottom">
           <div className="container">
-            <Link className="navbar-brand fw-semibold" href="/">CourseGen</Link>
+            <Link className="navbar-brand" href="/">CourseGen</Link>
 
             <button
               className="navbar-toggler"
@@ -24,24 +27,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </button>
 
             <div className="collapse navbar-collapse" id="mainNavbar">
-              {/* Left-side nav */}
-              <ul className="navbar-nav">
-                <li className="nav-item">
-                  <Link className="nav-link" href="/courses">Courses</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" href="/triage">Triage</Link>
-                </li>
-              </ul>
+              <div className="navbar-nav">
+                <Link className="nav-link" href="/courses">Courses</Link>
+                <Link className="nav-link" href="/triage">Triage</Link>
+              </div>
 
-              {/* Right-side auth nav */}
-              <ul className="navbar-nav ms-auto">
-                <AuthHeader />
-              </ul>
+              {/* Auth UI on the right */}
+              <AuthHeader />
             </div>
           </div>
         </nav>
-
 
         <main className="flex-grow-1">
           <div className="container container-narrow py-4">
@@ -49,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
 
-        <footer className="mt-auto py-3">
+        <footer className="mt-auto py-3 border-top">
           <div className="container text-muted small">
             © {new Date().getFullYear()} CourseGen • Readable in light & dark mode
           </div>

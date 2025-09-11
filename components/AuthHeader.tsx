@@ -10,12 +10,12 @@ export default async function AuthHeader() {
     return (
       <>
         <li className="nav-item">
-          <Link className="nav-link text-white fw-medium" href="/sign-in">
+          <Link className="nav-link text-white" href="/sign-in">
             Sign in
           </Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link text-white fw-medium" href="/sign-up">
+          <Link className="nav-link text-white" href="/sign-up">
             Sign up
           </Link>
         </li>
